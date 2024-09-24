@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "GameObject.h"
-#include "ManageItem.h"
+//#include "ManageItem.h"
 #include "Portal.h"
 
 class Player : public GameObject
@@ -11,7 +11,7 @@ public:
 	float m_hp;
 	WorldRotation m_rotation;
 	WorldLocation respawn_location;
-	std::array<Item, 1> m_player_items;
+	//std::array<Item, 1> m_player_items;
 	Portal portal;
 
 	// 스트레스 테스트용

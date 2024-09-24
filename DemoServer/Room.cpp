@@ -11,7 +11,6 @@ Room::~Room()
 void Room::StartGame()
 {
 	last_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-	item_manager.Init();
 	room_state = PLAY;
 }
 
@@ -26,7 +25,6 @@ void Room::UpdateTimer()
 	//}
 	if (last_epoch_time != now_epoch_time) {
 		last_epoch_time = now_epoch_time;
-		item_manager.UpdateTime();
 	}
 }
 

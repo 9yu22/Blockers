@@ -1,7 +1,10 @@
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\GameObject.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\GameObject.obj
-C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\ManageItem.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\ManageItem.obj
+C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Item.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Item.obj
+C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\ItemSpawner.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\ItemSpawner.obj
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Map.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Map.obj
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\iocp_server_multi.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\iocp_server_multi.obj
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Player.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Player.obj
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Portal.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Portal.obj
+C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Room.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Room.obj
+C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Server.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Server.obj
 C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\Session.cpp;C:\Users\givoo\Documents\GitHub\portal_in_my_island\DemoServer\x64\Release\Session.obj

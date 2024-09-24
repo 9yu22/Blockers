@@ -4,7 +4,8 @@
 #include <atomic>
 #include <mutex>
 #include "Session.h"
-#include "ManageItem.h"
+#include "Item.h"
+#include "ItemSpawner.h"
 
 enum ROOM_STATE { EMPTY, PLAY, LOBBY };
 
@@ -12,11 +13,9 @@ class Room
 {
 public:
 	std::array<Session, 4> sessions;
-	ItemSpawnManager item_manager;
+	ItemSpawner spawner;
 	std::mutex room_mutex;
-	/*std::atomic<int> in_game_timer = 0;
-	std::atomic<int> last_time;*/
-	int in_gmae_timer = 0;
+	int elapsedTime = 0;
 	int last_time;
 	int room_state = EMPTY;
 

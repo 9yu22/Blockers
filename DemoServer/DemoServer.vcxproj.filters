@@ -24,7 +24,7 @@
     <ClCompile Include="Iocp_server.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ManageItem.cpp">
+    <ClCompile Include="Item.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Map.cpp">
@@ -45,6 +45,12 @@
     <ClCompile Include="Room.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemSpawner.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DemoServer.h">
@@ -62,7 +68,7 @@
     <ClInclude Include="GameObject.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ManageItem.h">
+    <ClInclude Include="Item.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Map.h">
@@ -75,6 +81,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Room.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ItemSpawner.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
