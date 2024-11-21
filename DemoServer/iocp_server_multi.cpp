@@ -6,95 +6,98 @@
 #include "protocol.h"
 #include "Map.h"
 #include "ManageItem.h"
+#include "IOCPServer.h"
 
 #pragma comment(lib, "WS2_32.lib")
 #pragma comment(lib, "MSWSock.lib")
-using namespace std;
-constexpr int MAX_USER = 5000;
+//using namespace std;
+//constexpr int MAX_USER = 5000;
 
-SOCKET c_socket, server;
-EX_OVERLAPPED a_over;
+SOCKET c_socket, s_socket;
+//EX_OVERLAPPED a_over;
 
-array<Session, MAX_USER> clients;
+//array<Session, MAX_USER> clients;
 Map map;
 ItemSpawnManager item_manager;
+
+IOCPServer server;
 
 int set_item_id = 0;
 bool is_timer = false;
 
-void worker_thread(HANDLE h_iocp);
+void worker_thread();
 
-int get_new_client_id()
-{
-	for (int i = 0; i < MAX_USER; ++i) {
-		lock_guard<mutex> assign_id{ clients[i].session_mx };
-		if (clients[i].b_use == false)
-			return i;
-	}
-		
-	return -1;
-}
+//int get_new_client_id()
+//{
+//	for (int i = 0; i < MAX_USER; ++i) {
+//		lock_guard<mutex> assign_id{ clients[i].session_mx };
+//		if (clients[i].b_use == false)
+//			return i;
+//	}
+//		
+//	return -1;
+//}
 
-void disconnect(int c_id)
-{
-	for (auto& pl : clients) {
-		{
-			lock_guard<mutex> mx(clients[c_id].session_mx);
-			if (true != pl.b_use) continue;
-		}
-		pl.send_remove_player_packet(clients[c_id].m_player);		
-	}
-	closesocket(clients[c_id].m_socket);
-	std::cout << "클라이언트 " << c_id << " 연결 끊김" << std::endl;
-
-	{
-		lock_guard<mutex> mx(clients[c_id].session_mx);
-		clients[c_id].b_use = false;
-	}
-	
-}
+//void disconnect(int c_id)
+//{
+//	for (auto& pl : clients) {
+//		{
+//			lock_guard<mutex> mx(clients[c_id].session_mx);
+//			if (true != pl.b_use) continue;
+//		}
+//		pl.send_remove_player_packet(clients[c_id].m_player);		
+//	}
+//	closesocket(clients[c_id].m_socket);
+//	std::cout << "클라이언트 " << c_id << " 연결 끊김" << std::endl;
+//
+//	{
+//		lock_guard<mutex> mx(clients[c_id].session_mx);
+//		clients[c_id].b_use = false;
+//	}
+//	
+//}
 
 void process_packet(int c_id, char* packet)
 {
 	static CS_ADD_BLOCK_PACKET prev_add;
 	static CS_REMOVE_BLOCK_PACKET prev_remove;
 
-	if (!is_timer) {
-		item_manager.InitStartTime();
-		is_timer = true;
-	}
+	//if (!is_timer) {
+	//	item_manager.InitStartTime();
+	//	is_timer = true;
+	//}
 
-	// 일단 임시로 여기에..
-	item_manager.CalculateItemSpawnTime(); // 시간 계산
-	Item_type type = item_manager.CheckCanSpawn(); // 스폰 시간이 된 아이템을 반환
+	//// 일단 임시로 여기에..
+	//item_manager.CalculateItemSpawnTime(); // 시간 계산
+	//Item_type type = item_manager.CheckCanSpawn(); // 스폰 시간이 된 아이템을 반환
 
-	if (type != NONE) { // 모든 클라에게 해당 아이템(4개 위치) 전송
-		for (int i = 0; i < 4; i++) {
-			Item item(++set_item_id, type, i);
+	//if (type != NONE) { // 모든 클라에게 해당 아이템(4개 위치) 전송
+	//	for (int i = 0; i < 4; i++) {
+	//		Item item(++set_item_id, type, i);
 
-			for (auto& pl : clients) {
-				if (false == pl.b_use) continue;
-				pl.send_add_item_packet(item);
-				//switch (item.item_type) {
-				//case STONE:
-				//	std::cout << "클라이언트 " <<pl.m_player.m_id << "에게 돌 전송" << std::endl;
-				//	break;
+	//		for (auto& pl : clients) {
+	//			if (false == pl.b_use) continue;
+	//			pl.send_add_item_packet(item);
+	//			//switch (item.item_type) {
+	//			//case STONE:
+	//			//	std::cout << "클라이언트 " <<pl.m_player.m_id << "에게 돌 전송" << std::endl;
+	//			//	break;
 
-				//case AMETHYST:
-				//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 자수정 전송" << std::endl;
-				//	break;
+	//			//case AMETHYST:
+	//			//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 자수정 전송" << std::endl;
+	//			//	break;
 
-				//case RUBY:
-				//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 루비 전송" << std::endl;
-				//	break;
+	//			//case RUBY:
+	//			//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 루비 전송" << std::endl;
+	//			//	break;
 
-				//case DIAMOND:
-				//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 다이아 전송" << std::endl;
-				//	break;
-				//}
-			}
-		}
-	}
+	//			//case DIAMOND:
+	//			//	std::cout << "클라이언트 " << pl.m_player.m_id << "에게 다이아 전송" << std::endl;
+	//			//	break;
+	//			//}
+	//		}
+	//	}
+	//}
 
 	//for (int i = 0; i < 4; i++)
 	//{
@@ -290,163 +293,21 @@ void process_packet(int c_id, char* packet)
 
 int main()
 {
-	HANDLE h_iocp;
+	server.StartServer();
 
-	WSADATA WSAData;
-	WSAStartup(MAKEWORD(2, 2), &WSAData);
-	server = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	SOCKADDR_IN server_addr;
-	memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(PORT_NUM);
-	server_addr.sin_addr.S_un.S_addr = INADDR_ANY;
-	bind(server, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	listen(server, SOMAXCONN);
-	SOCKADDR_IN cl_addr;
-	int addr_size = sizeof(cl_addr);
-	h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-	CreateIoCompletionPort(reinterpret_cast<HANDLE>(server), h_iocp, 9999, 0);
-	c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	
-	a_over._op_type = OP_ACCEPT;
-	AcceptEx(server, c_socket, a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
-
-	vector <thread> worker_threads;
+	std::vector <std::thread> worker_threads;
 	int num_threads = std::thread::hardware_concurrency();
 	for (int i = 0; i < num_threads; ++i)
-		worker_threads.emplace_back(worker_thread, h_iocp);
+		worker_threads.emplace_back(worker_thread);
 
 	for (auto& thread : worker_threads)
 		thread.join();
 
-	closesocket(server);
+	closesocket(s_socket);
 	WSACleanup();
 }
 
-void worker_thread(HANDLE h_iocp)
+void worker_thread()
 {
-	while (true) {
-		DWORD num_bytes;
-		ULONG_PTR key;
-		WSAOVERLAPPED* over = nullptr;
-		BOOL ret = GetQueuedCompletionStatus(h_iocp, &num_bytes, &key, &over, INFINITE);
-		EX_OVERLAPPED* ex_over = reinterpret_cast<EX_OVERLAPPED*>(over);
-		if (FALSE == ret) {
-			if (ex_over->_op_type == OP_ACCEPT) {
-				cout << "Accept Error";
-				exit(-1);
-			}
-			else {
-				cout << "GQCS Error on client[" << key << "]\n";
-				disconnect(static_cast<int>(key));
-				if (ex_over->_op_type == OP_SEND) delete ex_over;
-				continue;
-			}
-		}
-
-		switch (ex_over->_op_type) {
-		case OP_ACCEPT: {
-			int client_id = get_new_client_id();
-			if (client_id != -1) {
-				clients[client_id].b_use = true;
-				clients[client_id].m_player.m_id = client_id;
-				clients[client_id].m_player.portal.m_id = client_id;
-
-				//switch (client_id % 4) {
-				//case 0:
-				//	clients[client_id].m_player.SetWorldLocation(7000.f, 7000.f, 1100.f);
-				//	clients[client_id].m_player.SetRespawnLocation(7000.f, 7000.f, 1100.f);
-				//	clients[client_id].m_player.portal.SetWorldLocation(6500.f, 6500.f, 300.f);
-				//	break;
-				//case 1:
-				//	clients[client_id].m_player.SetWorldLocation(-7000.f, 7000.f, 1100.f);
-				//	clients[client_id].m_player.SetRespawnLocation(-7000.f, 7000.f, 1100.f);
-				//	clients[client_id].m_player.portal.SetWorldLocation(-6500.f, 6500.f, 300.f);
-				//	break;
-				//case 2:
-				//	clients[client_id].m_player.SetWorldLocation(7000.f, -7000.f, 1100.f);
-				//	clients[client_id].m_player.SetRespawnLocation(7000.f, -7000.f, 1100.f);
-				//	clients[client_id].m_player.portal.SetWorldLocation(6500.f, -6500.f, 300.f);
-				//	break;
-				//case 3:
-				//	clients[client_id].m_player.SetWorldLocation(-7000.f, -7000.f, 1100.f);
-				//	clients[client_id].m_player.SetRespawnLocation(-7000.f, -7000.f, 1100.f);
-				//	clients[client_id].m_player.portal.SetWorldLocation(-6500.f, -6500.f, 300.f);
-				//	break;
-				//}
-
-				// 테스트용 시작 좌표
-				switch (client_id % 4) {
-				case 0:
-					clients[client_id].m_player.SetWorldLocation(700.f, 700.f, 1000.f);
-					clients[client_id].m_player.SetRespawnLocation(700.f, 700.f, 1000.f);
-					clients[client_id].m_player.portal.SetWorldLocation(950.f, 950.f, 700.f);
-					break;
-				case 1:
-					clients[client_id].m_player.SetWorldLocation(-700.f, -700.f, 1000.f);
-					clients[client_id].m_player.SetRespawnLocation(-700.f, -700.f, 1000.f);
-					clients[client_id].m_player.portal.SetWorldLocation(-950.f, -950.f, 700.f);
-					break;
-				case 2:
-					clients[client_id].m_player.SetWorldLocation(700.f, -700.f, 1000.f);
-					clients[client_id].m_player.SetRespawnLocation(700.f, -700.f, 1000.f);
-					clients[client_id].m_player.portal.SetWorldLocation(950.f, -950.f, 700.f);
-					break;
-				case 3:
-					clients[client_id].m_player.SetWorldLocation(-700.f, 700.f, 1000.f);
-					clients[client_id].m_player.SetRespawnLocation(-700.f, 700.f, 1000.f);
-					clients[client_id].m_player.portal.SetWorldLocation(-950.f, 950.f, 700.f);
-					break;
-				}
-
-				clients[client_id].m_prev_remain = 0;
-				clients[client_id].m_socket = c_socket;
-				CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket),
-					h_iocp, client_id, 0);
-				clients[client_id].do_recv();
-			}
-			else {
-				cout << "Max user exceeded.\n";
-				closesocket(c_socket);
-			}
-			c_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-			ZeroMemory(&a_over._over, sizeof(a_over._over));
-			int addr_size = sizeof(SOCKADDR_IN);
-			AcceptEx(server, c_socket, a_over._send_buf, 0, addr_size + 16, addr_size + 16, 0, &a_over._over);
-			break;
-		}
-		case OP_RECV: {
-			int remain_data = num_bytes + clients[key].m_prev_remain;
-			char* p = ex_over->_send_buf;
-			while (remain_data > 0) {
-				int packet_size = p[0];
-				if (packet_size <= remain_data) {
-					process_packet(static_cast<int>(key), p);
-					p = p + packet_size;
-					remain_data = remain_data - packet_size;
-				}
-				else break;
-			}
-			clients[key].m_prev_remain = remain_data;
-			if (remain_data > 0)
-				memcpy(ex_over->_send_buf, p, remain_data);
-			clients[key].do_recv();
-			break;
-		}
-		case OP_SEND:
-			//if (ex_over->_packet_type == SC_LOGIN_INFO) {
-			//	std::cout << "GQCS Login Send" << std::endl;
-			//}
-			//	
-			//else if (ex_over->_packet_type == SC_ADD_PLAYER) {
-			//	std::cout << "GQCS Add Send" << std::endl;
-			//}
-
-			/*else if (ex_over->_packet_type == SC_MOVE_PLAYER)
-				std::cout << "GQCS Move Send" << std::endl;*/
-
-			delete ex_over;
-			break;
-		}
-	}
+	server.Run();
 }

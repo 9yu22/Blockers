@@ -6,8 +6,7 @@
 #include "protocol.h"
 #include "ManageItem.h"
 
-class EX_OVERLAPPED {
-public:
+struct EX_OVERLAPPED {
 	WSAOVERLAPPED _over;
 	WSABUF _wsabuf;
 	char _send_buf[BUF_SIZE];
@@ -31,7 +30,7 @@ public:
 	}
 };
 
-class Session
+class Session // = Client
 {
 	EX_OVERLAPPED _recv_over;
 

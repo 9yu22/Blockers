@@ -127,7 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="IOCPServer.cpp" />
     <ClCompile Include="Iocp_server.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -154,9 +156,11 @@
     <ClCompile Include="Session.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientManager.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DemoServer.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="IOCPServer.h" />
     <ClInclude Include="ManageItem.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
