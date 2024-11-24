@@ -2,6 +2,14 @@
 #include "IOCPServer.h"
 #include "protocol.h"
 
+IOCPServer::IOCPServer()
+{
+}
+
+IOCPServer::~IOCPServer()
+{
+}
+
 void IOCPServer::StartServer()
 {
 	HANDLE h_iocp;
@@ -34,7 +42,7 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 	switch (_op_type) { 
 						
 	case OP_ACCEPT: {
-		int client_id = c_manager.GetClientId();
+		int client_id = GetClientId();
 		if (client_id != -1) {
 			clients[client_id].b_use = true;
 			clients[client_id].m_player.m_id = client_id;
@@ -91,6 +99,7 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 
 			clients[client_id].m_prev_remain = 0;
 			clients[client_id].m_socket = c_socket;
+			AddClientInRoom(&clients[client_id]); // 어차피 전체 클라이언트 수와 방의 크기 수를 맞춰놔서 일단 패스
 			CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket),
 				h_iocp, client_id, 0);
 			clients[client_id].do_recv();
@@ -111,7 +120,8 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 		while (remain_data > 0) {
 			int packet_size = p[0];
 			if (packet_size <= remain_data) {
-				process_packet(static_cast<int>(key), p);
+				int num = clients[static_cast<int>(key)].room_num;
+				rooms[num].ProcessPacket(static_cast<int>(key), p);
 				p = p + packet_size;
 				remain_data = remain_data - packet_size;
 			}
@@ -140,14 +150,78 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 	}
 }
 
+//int IOCPServer::LoginClient(SOCKET c_socket)
+//{
+//	int client_id = GetClientId();
+//	if (client_id != -1) {
+//		clients[client_id].b_use = true;
+//		clients[client_id].m_player.m_id = client_id;
+//		clients[client_id].m_player.portal.m_id = client_id;  // 얘는 게임 시작할 때 할당해주는 것이 맞는 것 같기는 한데..
+//
+//		clients[client_id].m_prev_remain = 0;
+//		clients[client_id].m_socket = c_socket;
+//
+//		return client_id; // 핸들에 소켓을 등록할 때 id가 필요하므로 어쩔 수 없이 반환한다.
+//	}
+//
+//	else {
+//		return -1;
+//	}
+//}
+
+void IOCPServer::DisconnectClient(int c_id)
+{
+	for (auto& pl : clients) {
+		{
+			std::lock_guard<std::mutex> mx(clients[c_id].session_mx);
+			if (true != pl.b_use) continue;
+		}
+		pl.send_remove_player_packet(clients[c_id].m_player);
+	}
+	closesocket(clients[c_id].m_socket);
+	std::cout << "클라이언트 " << c_id << " 연결 끊김" << std::endl;
+
+	{
+		std::lock_guard<std::mutex> mx(clients[c_id].session_mx);
+		clients[c_id].b_use = false;
+	}
+}
+
+int IOCPServer::GetClientId()
+{
+	for (int i = 0; i < MAX_USER; ++i) {
+		std::lock_guard<std::mutex> assign_id{ clients[i].session_mx };
+		if (clients[i].b_use == false)
+			return i;
+	}
+
+	return -1;
+}
+
+bool IOCPServer::AddClientInRoom(Session* s)
+{
+	// 이거 구현해야 한다. 근데 레퍼런스로 받아서 그대로 레퍼런스로 넣으면 현재 룸의 해당 배열의 클라이언트 자리가 사용되고 있는지 알 수가 없다. 따라서 기존에 클라이언트 배열에 
+	// 새 세션을 추가할 때처럼 부울 변수 하나와 뮤텍스를 추가로 두고 해당 배열 자리가 사용되고 있는지 아닌지 관리가 필요하다. 기존 세션 클래스+추가 변수로 이루어진 구조체가 필요할 듯 하다.
+	// 혹은 레퍼런스가 아닌 포인터를 사용하여 null 여부로 판정하는 것도 가능할 듯 하다.->이거 사용해서 빠르게 해봐야겠다.
+
+	for (auto& room : rooms) {
+		for (int i = 0; i < MAX_PLAYER; ++i) {
+			if (room.clients[i] != nullptr) {
+				room.clients[i] = s;
+				room.SetPlayerInfo(i);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void IOCPServer::Run()
 {
 	while (true) {
-		DWORD num_bytes;
-		ULONG_PTR key;
 		WSAOVERLAPPED* over = nullptr;
 		BOOL ret = GetQueuedCompletionStatus(h_iocp, &num_bytes, &key, &over, INFINITE);
-		EX_OVERLAPPED* ex_over = reinterpret_cast<EX_OVERLAPPED*>(over);
+		ex_over = reinterpret_cast<EX_OVERLAPPED*>(over);
 		if (FALSE == ret) {
 			if (ex_over->_op_type == OP_ACCEPT) {
 				std::cout << "Accept Error";
@@ -155,12 +229,18 @@ void IOCPServer::Run()
 			}
 			else {
 				std::cout << "GQCS Error on client[" << key << "]\n";
-				c_manager.DisconnectClient(static_cast<int>(key));
+				DisconnectClient(static_cast<int>(key));
 				if (ex_over->_op_type == OP_SEND) delete ex_over;
 				continue;
 			}
 		}
 
-		
+		ProcessGQCS(ex_over->_op_type);
 	}
+}
+
+void IOCPServer::EndServer()
+{
+	closesocket(s_socket);
+	WSACleanup();
 }

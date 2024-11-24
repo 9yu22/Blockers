@@ -37,9 +37,11 @@ class Session // = Client
 public:
 	SOCKET m_socket;
 	Player m_player;
-
+	
 	int m_prev_remain;
 	bool b_use;
+
+	int room_num;
 
 	std::mutex session_mx;
 

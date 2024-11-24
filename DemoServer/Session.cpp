@@ -5,6 +5,7 @@ Session::Session()
 {
 	b_use = false;
 	m_prev_remain = 0;
+	room_num = -1;
 }
 
 Session::~Session()
