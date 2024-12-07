@@ -12,8 +12,6 @@ IOCPServer::~IOCPServer()
 
 void IOCPServer::StartServer()
 {
-	HANDLE h_iocp;
-
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
