@@ -45,56 +45,6 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 			clients[client_id].b_use = true;
 			clients[client_id].m_player.m_id = client_id;
 			clients[client_id].m_player.portal.m_id = client_id;
-
-			// 이제 좌표 할당을 room에 클라이언트가 할당될 때 room 내부의 배열 위치를 기준으로 할당할 예정
-
-			//switch (client_id % 4) {
-			//case 0:
-			//	clients[client_id].m_player.SetWorldLocation(7000.f, 7000.f, 1100.f);
-			//	clients[client_id].m_player.SetRespawnLocation(7000.f, 7000.f, 1100.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(6500.f, 6500.f, 300.f);
-			//	break;
-			//case 1:
-			//	clients[client_id].m_player.SetWorldLocation(-7000.f, 7000.f, 1100.f);
-			//	clients[client_id].m_player.SetRespawnLocation(-7000.f, 7000.f, 1100.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(-6500.f, 6500.f, 300.f);
-			//	break;
-			//case 2:
-			//	clients[client_id].m_player.SetWorldLocation(7000.f, -7000.f, 1100.f);
-			//	clients[client_id].m_player.SetRespawnLocation(7000.f, -7000.f, 1100.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(6500.f, -6500.f, 300.f);
-			//	break;
-			//case 3:
-			//	clients[client_id].m_player.SetWorldLocation(-7000.f, -7000.f, 1100.f);
-			//	clients[client_id].m_player.SetRespawnLocation(-7000.f, -7000.f, 1100.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(-6500.f, -6500.f, 300.f);
-			//	break;
-			//}
-			//
-			// 테스트용 시작 좌표 
-			//switch (client_id % 4) {
-			//case 0:
-			//	clients[client_id].m_player.SetWorldLocation(700.f, 700.f, 1000.f);
-			//	clients[client_id].m_player.SetRespawnLocation(700.f, 700.f, 1000.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(950.f, 950.f, 700.f);
-			//	break;
-			//case 1:
-			//	clients[client_id].m_player.SetWorldLocation(-700.f, -700.f, 1000.f);
-			//	clients[client_id].m_player.SetRespawnLocation(-700.f, -700.f, 1000.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(-950.f, -950.f, 700.f);
-			//	break;
-			//case 2:
-			//	clients[client_id].m_player.SetWorldLocation(700.f, -700.f, 1000.f);
-			//	clients[client_id].m_player.SetRespawnLocation(700.f, -700.f, 1000.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(950.f, -950.f, 700.f);
-			//	break;
-			//case 3:
-			//	clients[client_id].m_player.SetWorldLocation(-700.f, 700.f, 1000.f);
-			//	clients[client_id].m_player.SetRespawnLocation(-700.f, 700.f, 1000.f);
-			//	clients[client_id].m_player.portal.SetWorldLocation(-950.f, 950.f, 700.f);
-			//	break;
-			//}
-
 			clients[client_id].m_prev_remain = 0;
 			clients[client_id].m_socket = c_socket;
 			AddClientInRoom(&clients[client_id]); // 어차피 전체 클라이언트 수와 방의 크기 수를 맞춰놔서 일단 패스
@@ -132,40 +82,11 @@ void IOCPServer::ProcessGQCS(OP_TYPE _op_type)
 		break;
 	}
 	case OP_SEND:
-		//if (ex_over->_packet_type == SC_LOGIN_INFO) {
-		//	std::cout << "GQCS Login Send" << std::endl;
-		//}
-		//	
-		//else if (ex_over->_packet_type == SC_ADD_PLAYER) {
-		//	std::cout << "GQCS Add Send" << std::endl;
-		//}
-
-		/*else if (ex_over->_packet_type == SC_MOVE_PLAYER)
-			std::cout << "GQCS Move Send" << std::endl;*/
 
 		delete ex_over;
 		break;
 	}
 }
-
-//int IOCPServer::LoginClient(SOCKET c_socket)
-//{
-//	int client_id = GetClientId();
-//	if (client_id != -1) {
-//		clients[client_id].b_use = true;
-//		clients[client_id].m_player.m_id = client_id;
-//		clients[client_id].m_player.portal.m_id = client_id;  // 얘는 게임 시작할 때 할당해주는 것이 맞는 것 같기는 한데..
-//
-//		clients[client_id].m_prev_remain = 0;
-//		clients[client_id].m_socket = c_socket;
-//
-//		return client_id; // 핸들에 소켓을 등록할 때 id가 필요하므로 어쩔 수 없이 반환한다.
-//	}
-//
-//	else {
-//		return -1;
-//	}
-//}
 
 void IOCPServer::DisconnectClient(int c_id)
 {

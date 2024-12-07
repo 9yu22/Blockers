@@ -16,8 +16,7 @@ public:
 	std::mutex room_mutex;
 	/*std::atomic<int> in_game_timer = 0;
 	std::atomic<int> last_time;*/
-	int in_gmae_timer = 0;
-	int last_time;
+	time_t elapsed_time = 0;
 	int room_state = EMPTY;
 
 	int set_item_id = 0;
@@ -30,7 +29,7 @@ public:
 	void SetPlayerInfo(int num);
 	void StartGame();
 	void ProcessPacket(int c_id, char* packet);
-	void UpdateTimer();
+	void ProcessTimerEvent(time_t dutarion_time);
 	void EndGame();
 	void DisconnectClient(int c_id); // 급한대로 가져옴
 };

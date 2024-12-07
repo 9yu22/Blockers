@@ -7,38 +7,29 @@
 #include "Map.h"
 #include "ManageItem.h"
 #include "IOCPServer.h"
+#include "Thread.h"
 
 #pragma comment(lib, "WS2_32.lib")
 #pragma comment(lib, "MSWSock.lib")
-//using namespace std;
-//constexpr int MAX_USER = 5000;
 
-//SOCKET c_socket, s_socket;
-//EX_OVERLAPPED a_over;
-
-//array<Session, MAX_USER> clients;
-//Map map;
-//ItemSpawnManager item_manager;
 IOCPServer server;
-
-void worker_thread();
 
 int main()
 {
 	server.StartServer();
 
+	Thread thread(server);
+
 	std::vector <std::thread> worker_threads;
-	int num_threads = std::thread::hardware_concurrency();
+	int num_threads = std::thread::hardware_concurrency() - 1; // 워커 스레드 하나 줄이고 하나는 타이머 스레드 생성
 	for (int i = 0; i < num_threads; ++i)
-		worker_threads.emplace_back(worker_thread);
+		worker_threads.emplace_back(&Thread::RunWorkerThread, &thread);
+	 
+	std::thread timer_thread(&Thread::RunTimerThread, &thread);
+	timer_thread.join();
 
 	for (auto& thread : worker_threads)
 		thread.join();
 
 	server.EndServer();
-}
-
-void worker_thread()
-{
-	server.Run();
 }

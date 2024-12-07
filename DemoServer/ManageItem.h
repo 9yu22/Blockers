@@ -23,8 +23,8 @@ class ItemSpawnManager
 {
 public:
 	//std::array<Item, 4> manage_items;
-	std::array<int, 4> item_spawn_time;
-	std::array<int, 4> calculate_spawn_time;
+	std::array<time_t, 4> item_spawn_time;
+	std::array<time_t, 4> calculate_spawn_time;
 
 	int count_id = 0;
 
@@ -34,6 +34,6 @@ public:
 
 	//void SpawnItem(Item_type type);
 	void Init();
-	void UpdateTime();
+	void UpdateTime(time_t dutarion_time);
 	Item_type CheckCanSpawn();
 };

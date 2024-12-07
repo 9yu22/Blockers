@@ -101,20 +101,20 @@ ItemSpawnManager::~ItemSpawnManager()
 }
 void ItemSpawnManager::Init()
 {
-	item_spawn_time[STONE] = 5.0;
-	item_spawn_time[AMETHYST] = 10.0;
-	item_spawn_time[RUBY] = 20.0;
-	item_spawn_time[DIAMOND] = 30.0;
+	item_spawn_time[STONE] = 5000;
+	item_spawn_time[AMETHYST] = 10000;
+	item_spawn_time[RUBY] = 20000;
+	item_spawn_time[DIAMOND] = 30000;
 
 	for (auto& cst : calculate_spawn_time) {
-		cst = -5.0;
+		cst = -5000;
 	}
 }
 
-void ItemSpawnManager::UpdateTime()
+void ItemSpawnManager::UpdateTime(time_t duration_time)
 {
 	for (auto& cst : calculate_spawn_time) {
-		cst++;
+		cst += duration_time;
 	}
 }
 

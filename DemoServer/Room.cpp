@@ -66,25 +66,14 @@ void Room::SetPlayerInfo(int index_num)
 
 void Room::StartGame()
 {
-	last_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	item_manager.Init();
 	room_state = PLAY;
 }
 
-void Room::UpdateTimer()
+void Room::ProcessTimerEvent(time_t duration_time)
 {
-	int last_epoch_time = last_time;
-	int now_epoch_time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-	
-	// 타이머 스레드 따로 만들거라..
-	//if (atomic_compare_exchange_strong(&last_time, &last_epoch_time, now_epoch_time)) {
-	//	in_game_timer++;
-	//}
-	if (last_epoch_time != now_epoch_time) {
-		//last_epoch_time = now_epoch_time; --> 11/24: 왜 이렇게 했었지..?
-		last_time = now_epoch_time;
-		item_manager.UpdateTime();
-	}
+    elapsed_time += duration_time;
+    item_manager.UpdateTime(duration_time);
 }
 
 void Room::ProcessPacket(int c_id, char* packet)
@@ -98,19 +87,19 @@ void Room::ProcessPacket(int c_id, char* packet)
     }
 
     // 임시
-    UpdateTimer();
-    Item_type type = item_manager.CheckCanSpawn();
+    //UpdateTimer();
+    //Item_type type = item_manager.CheckCanSpawn();
 
-    if (type != NONE) {
-        for (int i = 0; i < 4; i++) {
-            Item item(++set_item_id, type, i);
+    //if (type != NONE) {
+    //    for (int i = 0; i < 4; i++) {
+    //        Item item(++set_item_id, type, i);
 
-            for (auto& pl : clients) {
-                if (false == pl->b_use) continue;
-                pl->send_add_item_packet(item);
-            }
-        }
-    }
+    //        for (auto& pl : clients) {
+    //            if (false == pl->b_use) continue;
+    //            pl->send_add_item_packet(item);
+    //        }
+    //    }
+    //}
 
     switch (packet[1]) {
     case CS_LOGIN: {
